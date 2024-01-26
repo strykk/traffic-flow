@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "traffic-flow"
+version = "0.1.0"
+description = "Traffic flow simulation - the final project for the Introduction to Deterministic Models course"
+authors = ["strykk <thestrykk@gmail.com>"]
+readme = "README.md"
+packages = [{include = "traffic_flow"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
