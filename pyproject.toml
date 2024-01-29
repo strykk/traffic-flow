@@ -8,6 +8,7 @@ packages = [{include = "traffic_flow"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+pygame = "^2.5.2"
 
 
 [tool.poetry.group.dev.dependencies]
