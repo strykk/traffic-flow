@@ -36,7 +36,9 @@ class Vehicle:
         self.acceleration = acceleration
 
     def _update_free_road_acceleration_component(self):
-        return self.maximum_acceleration * (1 - (self.velocity / self.desired_velocity) ** self.acceleration_exponent)
+        return self.maximum_acceleration * (
+            1 - (self.velocity / self.desired_velocity) ** self.acceleration_exponent
+        )
 
     def _update_leading_vehicle_acceleration_component(self, leading_vehicle: Vehicle):
         approaching_rate = self.velocity - leading_vehicle.velocity

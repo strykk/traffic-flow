@@ -20,7 +20,9 @@ def process_simulation_evolution(
     simulation_evolution: list[list[list[float]]],
 ) -> list[float]:
 
-    clean_data = [position for roadmap in simulation_evolution for road in roadmap for position in road]
+    clean_data = [
+        position for roadmap in simulation_evolution for road in roadmap for position in road
+    ]
 
     return clean_data
 
