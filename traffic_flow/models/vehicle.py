@@ -15,3 +15,6 @@ class Vehicle:
         self.mininimal_desired_distance = 2  # s0, m
         self.acceleration_exponent = 4  # delta
         self.driver_reaction_time = 1.6  # T, s
+
+        # Position in meters with respect to the road the vehicle is currently on.
+        self.position = 0
