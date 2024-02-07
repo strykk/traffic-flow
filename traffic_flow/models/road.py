@@ -29,7 +29,7 @@ class Road:
         leading_vehicle = None
         positions = []
 
-        for vehicle in self.vehicles:
+        for vehicle in list(self.vehicles):
             vehicle_position = vehicle.move(time_step, leading_vehicle)
 
             leading_vehicle = vehicle
