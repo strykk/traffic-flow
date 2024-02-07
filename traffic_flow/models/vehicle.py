@@ -62,7 +62,7 @@ class Vehicle:
     def _update_position_negative_velocity(self, time_step: float):
         self.position -= self.velocity * time_step / 2
 
-    def move(self, time_step: float, leading_vehicle: Vehicle) -> float:
+    def move(self, time_step: float, leading_vehicle: Vehicle | None) -> float:
         self._update_acceleration(leading_vehicle)
 
         updated_velocity = self._calculate_updated_velocity(time_step)
