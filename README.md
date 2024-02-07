@@ -36,3 +36,15 @@ The project uses `pre-commit` to keep the code well-formatted. You can install i
 ```bash
 pre-commit install
 ```
+
+### Testing
+
+A simple scenario was added as a form of sanity check. To run it, use the command:
+
+```bash
+python tests/scenarios/single_vehicle_scenario.py
+```
+
+As a result it should, show a distance over time plot of a single car. The vehicle
+started from a velocity 0 and the max velocity is 120 km/h. It took around
+85 seconds to travel 2 km, it seems about right.

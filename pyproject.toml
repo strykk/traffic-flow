@@ -8,6 +8,8 @@ packages = [{include = "traffic_flow"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+numpy = "^1.26.3"
+plotly = "^5.18.0"
 
 
 [tool.poetry.group.dev.dependencies]
