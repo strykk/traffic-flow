@@ -4,9 +4,6 @@ import numpy as np
 
 from traffic_flow.models.vehicle import Vehicle
 
-# TODO: Think how to pass the time step value of a particular simulation.
-TIME_STEP: float = 1 / 60
-
 
 class Road:
     """Single lane of a road in a simulation
@@ -28,15 +25,15 @@ class Road:
     def add_vehicle(self, vehicle: Vehicle) -> None:
         self.vehicles.append(vehicle)
 
-    def update(self) -> list[float]:
+    def update(self, time_step) -> list[float]:
         leading_vehicle = None
         positions = []
 
         for vehicle in self.vehicles:
-            vehicle.move(TIME_STEP, leading_vehicle)
+            vehicle_position = vehicle.move(time_step, leading_vehicle)
 
             leading_vehicle = vehicle
-            if (vehicle_position := vehicle.position) > self.length:
+            if vehicle_position > self.length:
                 self.vehicles.popleft()
             else:
                 positions.append(vehicle_position)
