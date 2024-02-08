@@ -8,13 +8,16 @@ from traffic_flow.simulation_helpers.vehicle_generator import VehiclesGenerator
 def run_scenario() -> list[dict]:
     highway = models.Road((0, 0), (2_000, 0), "A4")
     highway_back = models.Road((2_000, 0), (0, 0), "A4-back")
-    route = [highway, highway_back]
+    highway.add_next_road(highway_back)
+
+    roadmap = {"A4": highway, "A4-back": highway_back}
+    route = ["A4", "A4-back"]
 
     vehicles_generator = VehiclesGenerator()
     vehicles_generator.add_vehicle(route, 0)
     vehicles_specifications = vehicles_generator.vehicles_specifications
 
-    single_vehicle_simulation = models.TrafficFlow(vehicles_specifications)
+    single_vehicle_simulation = models.TrafficFlow(vehicles_specifications, roadmap)
     single_vehicle_simulation.total_time = 240
 
     single_vehicle_simulation.run()
