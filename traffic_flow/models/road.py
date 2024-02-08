@@ -25,18 +25,3 @@ class Road:
 
     def add_vehicle(self, vehicle: "Vehicle") -> None:  # type: ignore # noqa
         self.vehicles.append(vehicle)
-
-    def update(self, time_step) -> list[float]:
-        leading_vehicle = None
-        positions = []
-
-        for vehicle in list(self.vehicles):
-            vehicle_position = vehicle.move(time_step, leading_vehicle)
-
-            leading_vehicle = vehicle
-            if vehicle_position > self.length:
-                self.vehicles.popleft()
-            else:
-                positions.append(vehicle_position)
-
-        return positions
