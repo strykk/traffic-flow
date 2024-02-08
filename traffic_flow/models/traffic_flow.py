@@ -1,12 +1,20 @@
+from __future__ import annotations
+
 from collections import deque
 
-from traffic_flow.models.vehicle import Vehicle
+from .traffic_lights import TrafficLights
+from .vehicle import Vehicle
 
 
 class TrafficFlow:
     """Single simulation of a traffic flow"""
 
-    def __init__(self, vehicles_specification: list[dict]) -> None:
+    def __init__(
+        self,
+        vehicles_specification: list[dict],
+        roadmap: dict[str, "Road"],  # type: ignore # noqa
+        traffic_lights: list[TrafficLights] | None = None,
+    ) -> None:
         self.time_step = 1 / 60  # seconds
         self.total_time = 120  # seconds
 
@@ -17,9 +25,14 @@ class TrafficFlow:
         self.vehicles = deque[Vehicle]()
         self.retired_vehicles = deque[Vehicle]()
 
+        self.roadmap = roadmap
+        self.traffic_lights = traffic_lights
+
     def _prepare_vehicles_specification_queue(
         self, vehicles_specification: list[dict]
     ) -> deque[dict]:
+        if not vehicles_specification:
+            raise ValueError("You cannot start simulation with no vehicle specified!")
         vehicles_specification = sorted(
             vehicles_specification, key=lambda vehicle_spec: vehicle_spec["ride_start_time"]
         )
@@ -27,9 +40,9 @@ class TrafficFlow:
         return deque(vehicles_specification)
 
     def start_vehicle_ride(self, vehicle_specification: dict) -> None:
-        # NOTE: Vehicle must be initialized here, because creating the Vehicle automatically
-        # put it on a starting road. Does not seem good.
         vehicle = Vehicle(**vehicle_specification)
+        vehicle.start_ride(self.roadmap)
+
         self.vehicles.append(vehicle)
 
     def update(self):
@@ -52,10 +65,7 @@ class TrafficFlow:
         self.simulation_evolution = simulation_evolution
 
     def run(self):
-        try:
-            next_vehicle = self.vehicles_specification_queue.popleft()
-        except IndexError:
-            raise ValueError("You cannot start simulation with no vehicle specified!")
+        next_vehicle = self.vehicles_specification_queue.popleft()
 
         next_vehicle_ride_start_time = next_vehicle.pop(
             "ride_start_time"
@@ -71,6 +81,14 @@ class TrafficFlow:
                     next_vehicle_ride_start_time = next_vehicle.pop("ride_start_time")
                 else:
                     next_vehicle_ride_start_time = None
+
+            for road in self.roadmap.values():
+                for vehicle in list(road.vehicles):
+                    vehicle.move(self.time_step)
+
+            if self.traffic_lights:
+                for trafffic_lights in self.traffic_lights:
+                    trafffic_lights.tic(self.time_step)
             self.update()
             time += self.time_step
 

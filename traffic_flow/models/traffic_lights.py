@@ -1,12 +1,12 @@
-from itertools import cycle
+from __future__ import annotations
 
-from .road import Road
+from itertools import cycle
 
 
 class TrafficLights:
     def __init__(
         self,
-        roads: list[Road],
+        roads: list["Road"],  # type: ignore # noqa
         cycle_times: list[float],
         cycle_green_lights: list[tuple[bool]],
         approaching_speed: float = 5,
@@ -38,7 +38,7 @@ class TrafficLights:
 
         return cycle(cycle_green_lights)
 
-    def _set_up_roads(self, roads: list[Road]) -> list[Road]:
+    def _set_up_roads(self, roads: list["Road"]) -> list["Road"]:  # type: ignore # noqa
         for road in roads:
             road.set_traffic_lights(self)
 
