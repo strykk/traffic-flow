@@ -2,16 +2,19 @@ import numpy as np
 from plotly.subplots import make_subplots
 
 from traffic_flow import models
+from traffic_flow.simulation_helpers.vehicle_generator import VehiclesGenerator
 
 
 def run_scenario() -> list[dict]:
     highway = models.Road((0, 0), (2_000, 0), "A4")
+    vehicles_generator = VehiclesGenerator()
+
     route = [highway]
-    vehicle = models.Vehicle(route)
 
-    single_vehicle_simulation = models.TrafficFlow()
+    vehicles_generator.add_vehicle(route, 0)
+    vehicle_sepcifications = vehicles_generator.vehicles_specifications
 
-    single_vehicle_simulation.add_vehicle(vehicle)
+    single_vehicle_simulation = models.TrafficFlow(vehicle_sepcifications)
 
     single_vehicle_simulation.run()
     return single_vehicle_simulation.simulation_evolution
