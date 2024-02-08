@@ -1,4 +1,6 @@
-from traffic_flow.models.road import Road
+from collections import deque
+
+from traffic_flow.models.vehicle import Vehicle
 
 
 class TrafficFlow:
@@ -8,26 +10,36 @@ class TrafficFlow:
         self.time_step = 1 / 60  # seconds
         self.total_time = 120  # seconds
 
-        self.roads = list[Road]()
+        self.vehicles = deque[Vehicle]()
+        self.retired_vehicles = deque[Vehicle]()
 
-    def add_road(self, road: Road) -> None:
-        self.roads.append(road)
+    def add_vehicle(self, vehicle: Vehicle) -> None:
+        self.vehicles.append(vehicle)
 
     def update(self):
-        vehicles_on_roadmap_positions = list[list[float]]()
+        if not self.vehicles:
+            pass
+        for _ in range(len(self.vehicles)):
+            vehicle = self.vehicles.popleft()
+            if vehicle.is_ride_finished:
+                self.retired_vehicles.append(vehicle)
+            else:
+                vehicle.move(self.time_step)
+                self.vehicles.append(vehicle)
 
-        for road in self.roads:
-            vehicles_on_roadmap_positions.append(road.update(self.time_step))
+    def _gather_data(self):
+        simulation_evolution = []
 
-        return vehicles_on_roadmap_positions
+        for vehicle in self.vehicles + self.retired_vehicles:
+            simulation_evolution.append(vehicle.ride_data)
+
+        self.simulation_evolution = simulation_evolution
 
     def run(self):
-        # Stores positions of all vehicles from all roads in the whole simulation.
-        simulation_evolution = []
         time = self.time_step
 
         while time <= self.total_time:
-            simulation_evolution.append(self.update())
+            self.update()
             time += self.time_step
 
-        return simulation_evolution
+        self._gather_data()
