@@ -34,7 +34,7 @@ def plot_result(data):
     for k, car_data in enumerate(data):
         road_data = car_data["roads_data"]["A4"]
         time = np.arange(len(road_data.get("position"))) / 60  # type: ignore
-        print(len(time))
+
         for n, _property in enumerate(properties):
             fig.add_scatter(
                 x=time,

@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import numpy as np
 from plotly.subplots import make_subplots
 
