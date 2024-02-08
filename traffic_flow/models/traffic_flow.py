@@ -26,7 +26,7 @@ class TrafficFlow:
 
         return deque(vehicles_specification)
 
-    def add_vehicle(self, vehicle_specification: dict) -> None:
+    def start_vehicle_ride(self, vehicle_specification: dict) -> None:
         # NOTE: Vehicle must be initialized here, because creating the Vehicle automatically
         # put it on a starting road. Does not seem good.
         vehicle = Vehicle(**vehicle_specification)
@@ -65,7 +65,7 @@ class TrafficFlow:
 
         while time <= self.total_time:
             if next_vehicle_ride_start_time is not None and time >= next_vehicle_ride_start_time:
-                self.add_vehicle(next_vehicle)
+                self.start_vehicle_ride(next_vehicle)
                 if self.vehicles_specification_queue:
                     next_vehicle = self.vehicles_specification_queue.popleft()
                     next_vehicle_ride_start_time = next_vehicle.pop("ride_start_time")
