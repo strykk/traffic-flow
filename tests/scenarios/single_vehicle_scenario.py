@@ -1,5 +1,3 @@
-from collections import deque
-
 import numpy as np
 from plotly.subplots import make_subplots
 
@@ -8,7 +6,7 @@ from traffic_flow import models
 
 def run_scenario() -> list[dict]:
     highway = models.Road((0, 0), (2_000, 0), "A4")
-    route = deque([highway])
+    route = [highway]
     vehicle = models.Vehicle(route)
 
     single_vehicle_simulation = models.TrafficFlow()
