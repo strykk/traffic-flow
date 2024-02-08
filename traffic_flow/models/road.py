@@ -20,6 +20,15 @@ class Road:
         self.index = index
         self.vehicles = deque["Vehicle"]()  # type: ignore
 
+        self.green_light = True
+        self.traffic_lights: "TrafficLights" | None = None  # type: ignore # noqa
+
+    def set_traffic_lights(self, traffic_lights: "TrafficLights"):  # type: ignore # noqa
+        self.traffic_lights = traffic_lights
+
+    def set_green_light(self, green_light_state: bool) -> None:
+        self.green_light = green_light_state
+
     def _calculate_road_length(self):
         return np.linalg.norm(np.array(self.start_point) - np.array(self.end_point))
 
