@@ -48,9 +48,9 @@ class Vehicle:
 
         self.new_position: float
         self.new_velocity: float
-        self.new_acceleration: float
 
         self.max_velocity = self.desired_velocity
+        self.slower_zone = False
 
     def _set_attributes(self, attributes: dict) -> None:
         for key, value in attributes.items():
@@ -90,7 +90,6 @@ class Vehicle:
     def start_ride(self, roadmap: dict[str, "Road"]) -> None:  # type: ignore # noqa
         first_road = roadmap[self.route.popleft()]
         self.current_road = first_road
-
         if first_road.vehicles:
             self.leading_vehicle = first_road.vehicles[-1]
         else:
@@ -104,7 +103,6 @@ class Vehicle:
             next_road = self.current_road.get_next_road(next_road_name)
 
             self.current_road = next_road
-
             if next_road.vehicles:
                 self.leading_vehicle = next_road.vehicles[-1]
             else:
@@ -112,7 +110,7 @@ class Vehicle:
                 self.leading_vehicle = None
 
             next_road.add_vehicle(self)
-            self.position = distance_passed
+            self.new_position = distance_passed
 
         except IndexError:
             self.is_ride_finished = True
@@ -156,22 +154,22 @@ class Vehicle:
                 self.leading_vehicle
             )
 
-        self.new_acceleration = acceleration
+        self.acceleration = acceleration
 
     def _calculate_updated_velocity(self, time_step: float):
         return self.velocity + self.acceleration * time_step
 
     def _update_position(self, time_step: float):
-        self.new_position += self.velocity * time_step + (self.acceleration * time_step**2) / 2
+        self.new_position += self.new_velocity * time_step + (self.acceleration * time_step**2) / 2
 
     def _update_position_negative_velocity(self, time_step: float):
-        self.new_position -= self.velocity * time_step / 2
+        self.new_position -= self.new_velocity * time_step / 2
 
     def _update_ride_data(self):
         road_data = self.ride_data["roads_data"][self.current_road.road_name]
 
-        road_data["position"].append(self.position)
-        road_data["velocity"].append(self.velocity)
+        road_data["position"].append(self.new_position)
+        road_data["velocity"].append(self.new_velocity)
         road_data["acceleration"].append(self.acceleration)
 
     def _slow_down(self, max_velocity: float):
@@ -182,7 +180,6 @@ class Vehicle:
 
     def move(self, time_step: float) -> None:
         # Swap variables.
-        self.acceleration = self.new_acceleration
         self.velocity = self.new_velocity
         self.position = self.new_position
 
@@ -195,14 +192,21 @@ class Vehicle:
             ) and not self.current_road.green_light:
                 if distance_to_node < traffic_lights.slowing_down_distance:
                     self._slow_down(traffic_lights.approaching_speed)
+                    self.slower_zone = True
 
                 if distance_to_node < traffic_lights.stopping_distance:
                     self._stop_vehicle()
                 else:
                     self._update_acceleration()
             else:
+                if self.slower_zone:
+                    self.max_velocity = self.desired_velocity
+                    self.slower_zone = False
                 self._update_acceleration()
         else:
+            if self.slower_zone:
+                self.max_velocity = self.desired_velocity
+                self.slower_zone = False
             self._update_acceleration()
 
         updated_velocity = self._calculate_updated_velocity(time_step)
@@ -215,8 +219,7 @@ class Vehicle:
             self._update_position(time_step)
 
         # New distance!
-        distance_to_node = self.current_road.length - self.position
-
+        distance_to_node = self.current_road.length - self.new_position
         # TODO: Optimize it later by making the road remember the first vehicle.
         if not self.first_vehicle and self.current_road.vehicles.index(self) == 0:
             self.first_vehicle = True

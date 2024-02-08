@@ -53,7 +53,6 @@ class TrafficFlow:
             if vehicle.is_ride_finished:
                 self.retired_vehicles.append(vehicle)
             else:
-                vehicle.move(self.time_step)
                 self.vehicles.append(vehicle)
 
     def _gather_data(self):
