@@ -13,8 +13,8 @@ class Vehicle:
     (references will be placed in README).
     """
 
-    def __init__(self, route: deque[Road], ride_data: dict = {}) -> None:
-        self.route = route
+    def __init__(self, route: list[Road], ride_data: dict | None = None) -> None:
+        self.route = deque(route)
         self.ride_data = self._initialize_ride_data(ride_data)
 
         self.leading_vehicle = None
@@ -50,7 +50,10 @@ class Vehicle:
         except IndexError:
             raise ValueError("Each Vehicle must have non-empty route!")
 
-    def _initialize_ride_data(self, ride_data: dict) -> dict:
+    def _initialize_ride_data(self, ride_data: dict | None) -> dict:
+        if ride_data is None:
+            ride_data = {}
+
         roads_data = {}
         for road in self.route:
             roads_data[road.index] = defaultdict(list)
