@@ -1,5 +1,3 @@
-from collections import deque
-
 import numpy as np
 from plotly.subplots import make_subplots
 
@@ -9,7 +7,7 @@ from traffic_flow import models
 def run_scenario() -> list[dict]:
     highway = models.Road((0, 0), (2_000, 0), "A4")
     highway_back = models.Road((2_000, 0), (0, 0), "A4-back")
-    route = deque([highway, highway_back])
+    route = [highway, highway_back]
     vehicle = models.Vehicle(route)
 
     single_vehicle_simulation = models.TrafficFlow()
@@ -45,6 +43,7 @@ def plot_result(data):
     fig.update_layout(
         template="plotly_white",
         xaxis_title="Time (s)",
+        xaxis2_title="Time (s)",
         yaxis4_range=(0, 33.333),
         yaxis5_range=(0, 0.8),
         yaxis6_range=(0, 0.8),
