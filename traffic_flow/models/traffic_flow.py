@@ -6,14 +6,30 @@ from traffic_flow.models.vehicle import Vehicle
 class TrafficFlow:
     """Single simulation of a traffic flow"""
 
-    def __init__(self) -> None:
+    def __init__(self, vehicles_specification: list[dict]) -> None:
         self.time_step = 1 / 60  # seconds
         self.total_time = 120  # seconds
+
+        self.vehicles_specification_queue = self._prepare_vehicles_specification_queue(
+            vehicles_specification
+        )
 
         self.vehicles = deque[Vehicle]()
         self.retired_vehicles = deque[Vehicle]()
 
-    def add_vehicle(self, vehicle: Vehicle) -> None:
+    def _prepare_vehicles_specification_queue(
+        self, vehicles_specification: list[dict]
+    ) -> deque[dict]:
+        vehicles_specification = sorted(
+            vehicles_specification, key=lambda vehicle_spec: vehicle_spec["ride_start_time"]
+        )
+
+        return deque(vehicles_specification)
+
+    def add_vehicle(self, vehicle_specification: dict) -> None:
+        # NOTE: Vehicle must be initialized here, because creating the Vehicle automatically
+        # put it on a starting road. Does not seem good.
+        vehicle = Vehicle(**vehicle_specification)
         self.vehicles.append(vehicle)
 
     def update(self):
@@ -36,9 +52,25 @@ class TrafficFlow:
         self.simulation_evolution = simulation_evolution
 
     def run(self):
-        time = self.time_step
+        try:
+            next_vehicle = self.vehicles_specification_queue.popleft()
+        except IndexError:
+            raise ValueError("You cannot start simulation with no vehicle specified!")
+
+        next_vehicle_ride_start_time = next_vehicle.pop(
+            "ride_start_time"
+        )  # NOTE: At the moment you cannot add vehicle at the same time.
+
+        time = 0
 
         while time <= self.total_time:
+            if next_vehicle_ride_start_time is not None and time >= next_vehicle_ride_start_time:
+                self.add_vehicle(next_vehicle)
+                if self.vehicles_specification_queue:
+                    next_vehicle = self.vehicles_specification_queue.popleft()
+                    next_vehicle_ride_start_time = next_vehicle.pop("ride_start_time")
+                else:
+                    next_vehicle_ride_start_time = None
             self.update()
             time += self.time_step
 

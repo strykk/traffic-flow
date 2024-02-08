@@ -13,28 +13,66 @@ class Vehicle:
     (references will be placed in README).
     """
 
-    def __init__(self, route: list[Road], ride_data: dict | None = None) -> None:
+    def __init__(
+        self,
+        route: list[Road],
+        vehicle_configs: dict | None = None,
+        vehicle_starting_properties: dict | None = None,
+        ride_data: dict | None = None,
+    ) -> None:
         self.route = deque(route)
         self.ride_data = self._initialize_ride_data(ride_data)
 
+        self._set_vehicle_configs(vehicle_configs)
+        self._set_vehicle_starting_properties(vehicle_starting_properties)
         self.leading_vehicle = None
         self._start_ride()
 
-        # For now, the vehicle params are hardcoded. The values are
-        # from the original paper. In the comment, the symbol and the unit.
-        self.vehicle_length = 5  # l, m
-        self.desired_velocity = 33.333  # v0, m/s
-        self.maximum_acceleration = 0.73  # a, m/s²
-        self.desired_deceleration = 1.67  # b, m/s²,
-        self.mininimal_desired_distance = 2  # s0, m
-        self.acceleration_exponent = 4  # delta
-        self.driver_reaction_time = 1.6  # T, s
+        self.vehicle_length: int  # l, m
+        self.desired_velocity: float  # v0, m/s
+        self.maximum_acceleration: float  # a, m/s²
+        self.desired_deceleration: float  # b, m/s²,
+        self.mininimal_desired_distance: float  # s0, m
+        self.acceleration_exponent: float  # delta
+        self.driver_reaction_time: float  # T, s
 
         # Position in meters with respect to the road the vehicle is currently on.
-        self.position = 0.0
+        self.position: float
 
-        self.velocity = 0
-        self.acceleration = 0
+        self.velocity: float
+        self.acceleration: float
+
+    def _set_attributes(self, attributes: dict) -> None:
+        for key, value in attributes.items():
+            setattr(self, key, value)
+
+    def _set_vehicle_configs(self, vehicle_configs: dict | None) -> None:
+        default_vehicle_configs = {
+            "vehicle_length": 5,  # l, m
+            "desired_velocity": 33.333,  # v0, m/s
+            "maximum_acceleration": 0.73,  # a, m/s²
+            "desired_deceleration": 1.67,  # b, m/s²,
+            "mininimal_desired_distance": 2,  # s0, m
+            "acceleration_exponent": 4,  # delta
+            "driver_reaction_time": 1.6,  # T, s
+        }
+
+        if vehicle_configs:
+            default_vehicle_configs |= vehicle_configs
+
+        self._set_attributes(default_vehicle_configs)
+
+    def _set_vehicle_starting_properties(self, vehicle_starting_properties: dict | None) -> None:
+        default_vehicle_starting_properties = {
+            "position": 0.0,
+            "velocity": 0,
+            "acceleration": 0,
+        }
+
+        if vehicle_starting_properties:
+            default_vehicle_starting_properties |= vehicle_starting_properties
+
+        self._set_attributes(default_vehicle_starting_properties)
 
     def _enter_road(self) -> None:
         current_road = self.route.popleft()
