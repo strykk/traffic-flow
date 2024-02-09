@@ -30,7 +30,6 @@ class Vehicle:
         self._set_vehicle_starting_properties(vehicle_starting_properties)
 
         self.leading_vehicle = None
-        self.first_vehicle = False
         self.is_ride_finished = False
 
         self.vehicle_length: int  # l, m
@@ -51,6 +50,8 @@ class Vehicle:
 
         self.max_velocity = self.desired_velocity
         self.slower_zone = False
+
+        self.travel_time = 0
 
     def _set_attributes(self, attributes: dict) -> None:
         for key, value in attributes.items():
@@ -92,8 +93,6 @@ class Vehicle:
         self.current_road = first_road
         if first_road.vehicles:
             self.leading_vehicle = first_road.vehicles[-1]
-        else:
-            self.first_vehicle = True  # Remember to check it in updates!
 
         first_road.add_vehicle(self)
 
@@ -106,7 +105,6 @@ class Vehicle:
             if next_road.vehicles:
                 self.leading_vehicle = next_road.vehicles[-1]
             else:
-                self.first_vehicle = True  # Remember to check it in updates!
                 self.leading_vehicle = None
 
             next_road.add_vehicle(self)
@@ -186,7 +184,7 @@ class Vehicle:
         distance_to_node = self.current_road.length - self.position
 
         # Check only if the vehicle is first vehicle - others adapt according to the equation.
-        if self.first_vehicle:
+        if self.current_road.vehicles.index(self) == 0:
             if (
                 traffic_lights := self.current_road.traffic_lights
             ) and not self.current_road.green_light:
@@ -221,8 +219,7 @@ class Vehicle:
         # New distance!
         distance_to_node = self.current_road.length - self.new_position
         # TODO: Optimize it later by making the road remember the first vehicle.
-        if not self.first_vehicle and self.current_road.vehicles.index(self) == 0:
-            self.first_vehicle = True
+        if self.current_road.vehicles.index(self) == 0:
             self.leading_vehicle = None
 
         if distance_to_node < 0:
@@ -230,3 +227,5 @@ class Vehicle:
             self._change_road(-distance_to_node)
 
         self._update_ride_data()
+
+        self.travel_time += time_step

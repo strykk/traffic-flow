@@ -28,6 +28,8 @@ class TrafficFlow:
         self.roadmap = roadmap
         self.traffic_lights = traffic_lights
 
+        self.stop_simulation = False
+
     def _prepare_vehicles_specification_queue(
         self, vehicles_specification: list[dict]
     ) -> deque[dict]:
@@ -47,6 +49,8 @@ class TrafficFlow:
 
     def update(self):
         if not self.vehicles:
+            if not self.vehicles_specification_queue:
+                self.stop_simulation = True
             pass
         for _ in range(len(self.vehicles)):
             vehicle = self.vehicles.popleft()
@@ -57,11 +61,15 @@ class TrafficFlow:
 
     def _gather_data(self):
         simulation_evolution = []
+        travel_times = []
 
+        for vehicle in self.retired_vehicles:
+            travel_times.append(vehicle.travel_time)
         for vehicle in self.vehicles + self.retired_vehicles:
             simulation_evolution.append(vehicle.ride_data)
 
         self.simulation_evolution = simulation_evolution
+        self.travel_times = travel_times
 
     def run(self):
         next_vehicle = self.vehicles_specification_queue.popleft()
@@ -72,7 +80,7 @@ class TrafficFlow:
 
         time = 0
 
-        while time <= self.total_time:
+        while not self.stop_simulation and time <= self.total_time:
             if next_vehicle_ride_start_time is not None and time >= next_vehicle_ride_start_time:
                 self.start_vehicle_ride(next_vehicle)
                 if self.vehicles_specification_queue:
