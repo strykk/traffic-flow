@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from plotly.subplots import make_subplots
 
@@ -40,10 +42,18 @@ def plot_result(data: dict[str, list]):
     for n, _property in enumerate(properties):
         fig.add_scatter(x=time, y=data.get(_property), row=n + 1, col=1, showlegend=False)
 
-    fig.update_layout(template="plotly_white", xaxis_title="Time (s)", yaxis_title="Distance (m)")
+    fig.update_layout(
+        template="plotly_white",
+        xaxis_title="Time (s)",
+        yaxis_title="Distance (m)",
+        height=800,
+        width=600,
+    )
     fig.update_layout(yaxis2_title="Velocity (m/s)")
     fig.update_layout(yaxis3_title="Acceleration (m/s²)")
     fig.show()
+
+    fig.write_image(Path("img", "single_vehicle.png"))
 
 
 if __name__ == "__main__":
