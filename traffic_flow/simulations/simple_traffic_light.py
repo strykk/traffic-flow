@@ -53,7 +53,7 @@ def run_simulation():
     for street1_green_light in cycle_times:
         for street2_green_light in cycle_times:
             results[f"{street1_green_light}_{street2_green_light}"] = prepare_scenario(
-                street2_green_light, street2_green_light
+                street1_green_light, street2_green_light
             )
 
     with open(Path("results", "simulation1.json"), "w") as file:
