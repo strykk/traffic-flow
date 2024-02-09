@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from plotly.subplots import make_subplots
 
@@ -7,7 +9,7 @@ from traffic_flow.simulation_helpers.vehicle_generator import VehiclesGenerator
 
 def run_scenario() -> list[dict]:
     in_street1 = models.Road((0, 0), (400, 0), "Street1")
-    out_street = models.Road((0, 0), (200, 0), "Street3")
+    out_street = models.Road((0, 0), (400, 0), "Street3")
 
     in_street1.add_next_road(out_street)
 
@@ -16,7 +18,7 @@ def run_scenario() -> list[dict]:
 
     traffic_lights = models.TrafficLights(
         [in_street1],
-        [15, 20],
+        [15, 40],
         [
             (True,),
             (False,),
@@ -48,7 +50,7 @@ def plot_result(data):
         2,
         shared_xaxes=True,
         row_titles=[_property.title() for _property in properties],
-        column_titles=["Street1", "Street3"],
+        column_titles=["Before traffic lights", "After traffic lights"],
     )
 
     car_data = data.pop()["roads_data"]
@@ -63,13 +65,21 @@ def plot_result(data):
                 row=n + 1,
                 col=k + 1,
                 marker_color=colors[k],
+                showlegend=False,
             )
 
     fig.update_layout(
         template="plotly_white",
         xaxis_title="Time (s)",
+        xaxis2_title="Time (s)",
+        yaxis3_range=(0, 15.2),
+        yaxis4_range=(0, 15.2),
+        width=600,
+        height=800,
     )
     fig.show()
+
+    fig.write_image(Path("img", "traffic_lights.png"))
 
 
 if __name__ == "__main__":

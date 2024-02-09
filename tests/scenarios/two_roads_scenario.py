@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from plotly.subplots import make_subplots
 
@@ -35,7 +37,11 @@ def process_simulation_evolution(
 def plot_result(data):
     properties = ["position", "velocity", "acceleration"]
     fig = make_subplots(
-        3, 2, shared_xaxes=True, row_titles=[_property.title() for _property in properties]
+        3,
+        2,
+        shared_xaxes=True,
+        row_titles=[_property.title() for _property in properties],
+        column_titles=["Road 1", "Road 2"],
     )
 
     for k, road_data in enumerate(data.values()):
@@ -50,11 +56,18 @@ def plot_result(data):
         template="plotly_white",
         xaxis_title="Time (s)",
         xaxis2_title="Time (s)",
+        yaxis1_range=(0, 2000),
+        yaxis2_range=(0, 2000),
+        yaxis3_range=(0, 33.333),
         yaxis4_range=(0, 33.333),
         yaxis5_range=(0, 0.8),
         yaxis6_range=(0, 0.8),
+        height=800,
+        width=600,
     )
     fig.show()
+
+    fig.write_image(Path("img", "two_roads.png"))
 
 
 if __name__ == "__main__":

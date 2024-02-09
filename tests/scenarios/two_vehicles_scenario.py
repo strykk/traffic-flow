@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from plotly.subplots import make_subplots
 
@@ -36,6 +38,10 @@ def plot_result(data):
         time = np.arange(len(road_data.get("position"))) / 60  # type: ignore
 
         for n, _property in enumerate(properties):
+            if n == 0:
+                showlegend = True
+            else:
+                showlegend = False
             fig.add_scatter(
                 x=time,
                 y=road_data.get(_property)[0:-2],
@@ -43,13 +49,13 @@ def plot_result(data):
                 col=1,
                 name=car_names[k],
                 marker_color=colors[k],
+                showlegend=showlegend,
             )
 
-    fig.update_layout(
-        template="plotly_white",
-        xaxis_title="Time (s)",
-    )
+    fig.update_layout(template="plotly_white", xaxis_title="Time (s)", width=600, height=800)
     fig.show()
+
+    fig.write_image(Path("img", "two_vehicles.png"))
 
 
 if __name__ == "__main__":
